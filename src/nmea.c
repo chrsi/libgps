@@ -132,7 +132,7 @@ uint8_t nmea_valid_checksum(const char *message) {
     if ( !message )
       return NMEA_CHECKSUM_ERR;  // possibly `exit` or something, this shouldn't happen
 
-    char *star = strchr(message, '*');
+    char *star = strchr(message, '*')+1;
     if ( !star )
       return NMEA_CHECKSUM_ERR;
 
