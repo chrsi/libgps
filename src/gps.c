@@ -33,8 +33,8 @@ extern void gps_location(loc_t *coord) {
         serial_code rc;
         do{
            rc = serial_readln(buffer, 256);
-        }while(rc != SERIAL_OK)
-        
+        }while(rc != SERIAL_OK);
+
         switch (nmea_get_message_type(buffer)) {
             case NMEA_GPGGA:
                 nmea_parse_gpgga(buffer, &gpgga);
