@@ -69,7 +69,7 @@ serial_code serial_readln(char *buffer, int len)
       }
     }while((c != '\n') && (curr_len < len-2));
     *b++ = '\0';
-    if (curr_len < len-1){
+    if (curr_len >= len-1){
       return SERIAL_BUFFER_OVERFLOW;
     }
     return SERIAL_OK;
