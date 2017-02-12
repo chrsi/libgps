@@ -56,18 +56,19 @@ serial_code serial_readln(char *buffer, int len)
 {
     char c;
     char *b = buffer;
-    int rx_length = -1;
     int curr_len = 0;
 
-    do{
-      rx_length = read(uart0_filestream, (void*)(&c), 1);
+    int rx_length = read(uart0_filestream, (void*)(&c), 1);
+
+    while((c != '\n') && (curr_len < len-1)){
       if (rx_length <= 0){
         sleep(1);
       }else{
         *b++ = c;
         curr_len++;
       }
-    }while((c != '\n') && (curr_len < len-2));
+      rx_length = read(uart0_filestream, (void*)(&c), 1);
+    }
     *b++ = '\0';
     if (curr_len >= len-1){
       return SERIAL_BUFFER_OVERFLOW;
