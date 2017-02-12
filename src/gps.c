@@ -7,10 +7,14 @@
 #include "nmea.h"
 #include "serial.h"
 
-extern void gps_init(void) {
-    serial_init();
-    serial_config();
+extern void gps_init(char* uart_interface) {
+    serial_code rc = serial_init(uart_interface);
+    if (rc != SERIAL_OK){
+      fprintf(stderr, "Could't open uart interface: %s", uart_interface);
+      exit(EXIT_FAILURE);
+    }
 
+    serial_config();
     //Write commands
 }
 
@@ -26,7 +30,11 @@ extern void gps_location(loc_t *coord) {
         gprmc_t gprmc;
         char buffer[256];
 
-        serial_readln(buffer, 256);
+        serial_code rc;
+        do{
+           rc = serial_readln(buffer, 256);
+        }while(rc != SERIAL_OK)
+        
         switch (nmea_get_message_type(buffer)) {
             case NMEA_GPGGA:
                 nmea_parse_gpgga(buffer, &gpgga);
@@ -47,6 +55,7 @@ extern void gps_location(loc_t *coord) {
 
                 status |= NMEA_GPRMC;
                 break;
+
         }
     }
 }
@@ -79,4 +88,3 @@ double gps_deg_dec(double deg_point)
 
     return round(absdlat + (absmlat/60) + (absslat/3600)) /1000000;
 }
-

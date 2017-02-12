@@ -10,14 +10,16 @@
 
 int uart0_filestream = -1;
 
-void serial_init(void)
+serial_code serial_init(char* interface)
 {
-    uart0_filestream = open(PORTNAME, O_RDWR | O_NOCTTY | O_NDELAY);
+    uart0_filestream = open(interface, O_RDWR | O_NOCTTY | O_NDELAY);
 
     if (uart0_filestream == -1)
     {
-        //TODO error handling...
+        return SERIAL_CANNOT_OPEN;
     }
+
+    return SERIAL_OK;
 }
 
 void serial_config(void)
@@ -50,29 +52,30 @@ void serial_println(const char *line, int len)
 
 // Read a line from UART.
 // Return a 0 len string in case of problems with UART
-void serial_readln(char *buffer, int len)
+serial_code serial_readln(char *buffer, int len)
 {
     char c;
     char *b = buffer;
     int rx_length = -1;
-    while(1) {
-        rx_length = read(uart0_filestream, (void*)(&c), 1);
+    int curr_len = 0;
 
-        if (rx_length <= 0) {
-            //wait for messages
-            sleep(1);
-        } else {
-            if (c == '\n') {
-                *b++ = '\0';
-                break;
-            }
-            *b++ = c;
-        }
+    do{
+      rx_length = read(uart0_filestream, (void*)(&c), 1);
+      if (rx_length <= 0){
+        sleep(1);
+      }else{
+        *b++ = c;
+        curr_len++;
+      }
+    }while((c != '\n') && (curr_len < len-2));
+    *b++ = '\0';
+    if (curr_len < len-1){
+      return SERIAL_BUFFER_OVERFLOW;
     }
+    return SERIAL_OK;
 }
 
 void serial_close(void)
 {
     close(uart0_filestream);
 }
-

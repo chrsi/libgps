@@ -7,10 +7,16 @@
 #define PORTNAME "/dev/ttyAMA0"
 #endif
 
-void serial_init(void);
+typedef enum {
+  SERIAL_OK,
+  SERIAL_CANNOT_OPEN,
+  SERIAL_BUFFER_OVERFLOW
+} serial_code;
+
+serial_code serial_init(char* interface);
 void serial_config(void);
 void serial_println(const char *, int);
-void serial_readln(char *, int);
+serial_code serial_readln(char *, int);
 void serial_close(void);
 
 #endif

@@ -11,7 +11,7 @@ struct location {
 typedef struct location loc_t;
 
 // Initialize device
-extern void gps_init(void);
+extern void gps_init(char* uart_interface);
 // Activate device
 extern void gps_on(void);
 // Get the actual location
